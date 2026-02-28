@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AstroVeda AI | Ancient Secrets</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body { 
+            background: radial-gradient(circle at center, #0f0c29, #302b63, #24243e);
+            color: #fff; font-family: 'Inter', sans-serif; min-height: 100vh;
+        }
+        .mystic-font { font-family: 'Cinzel', serif; }
+        .glass { 
+            background: rgba(255, 255, 255, 0.05); 
+            backdrop-filter: blur(10px); 
+            border: 1px solid rgba(251, 191, 36, 0.2); 
+        }
+        input { 
+            background: rgba(0, 0, 0, 0.5) !important; 
+            border: 1px solid rgba(251, 191, 36, 0.3) !important; 
+            color: #fbbf24 !important; padding: 12px; border-radius: 8px; width: 100%;
+        }
+        .stars {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: url('https://www.transparenttextures.com/patterns/stardust.png');
+            z-index: -1; opacity: 0.3;
+        }
+    </style>
+</head>
+<body class="p-6">
+    <div class="stars"></div>
+
+    <header class="text-center py-10">
+        <h1 class="mystic-font text-5xl text-yellow-500 drop-shadow-2xl">ASTROVEDA AI</h1>
+        <p class="text-yellow-200/40 tracking-[0.4em] uppercase text-[10px] mt-2">Vedic Wisdom • Neural Intelligence</p>
+    </header>
+
+    <main class="max-w-4xl mx-auto">
+        <div class="glass p-8 rounded-3xl shadow-2xl">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <input type="text" id="name" placeholder="Full Name">
+                <input type="date" id="dob">
+                <input type="time" id="tob">
+                <input type="text" id="pob" placeholder="City of Birth">
+            </div>
+            <button onclick="getReading()" id="btn" class="w-full mt-8 py-4 bg-yellow-600 hover:bg-yellow-500 text-black font-bold rounded-xl transition uppercase tracking-widest shadow-lg">
+                Consult The Oracle
+            </button>
+        </div>
+
+        <div id="resultBox" class="mt-10 glass p-8 rounded-3xl hidden animate-fade-in">
+            <div id="loader" class="text-center py-10 hidden">
+                <div class="animate-spin h-10 w-10 border-4 border-yellow-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+                <p class="mystic-font text-yellow-200">The stars are aligning...</p>
+            </div>
+            <div id="aiText" class="prose prose-invert max-w-none text-gray-200 leading-relaxed"></div>
+        </div>
+    </main>
+
+    <div id="disclaimer" class="fixed inset-0 bg-black/90 flex items-center justify-center p-6 z-50">
+        <div class="glass max-w-lg p-8 rounded-3xl text-center">
+            <h2 class="mystic-font text-2xl text-yellow-500 mb-4">Celestial Consent</h2>
+            <p class="text-sm text-gray-400 mb-6">Astrology provides spiritual perspective. By entering, you acknowledge that readings are for entertainment and self-reflection, not medical or legal advice.</p>
+            <button onclick="closeDisclaimer()" class="px-8 py-3 bg-yellow-600 text-black font-bold rounded-lg hover:bg-yellow-500 transition">I SEEK WISDOM</button>
+        </div>
+    </div>
+
+    <script>
+        function closeDisclaimer() {
+            document.getElementById('disclaimer').classList.add('hidden');
+        }
+
+        async function getReading() {
+            const btn = document.getElementById('btn');
+            const box = document.getElementById('resultBox');
+            const text = document.getElementById('aiText');
+            const loader = document.getElementById('loader');
+
+            const data = {
+                name: document.getElementById('name').value,
+                dob: document.getElementById('dob').value,
+                tob: document.getElementById('tob').value,
+                pob: document.getElementById('pob').value
+            };
+
+            if(!data.name || !data.dob || !data.tob || !data.pob) return alert("Fill all fields.");
+
+            btn.disabled = true;
+            btn.innerText = "OPENING PORTAL...";
+            box.classList.remove('hidden');
+            loader.classList.remove('hidden');
+            text.innerHTML = "";
+
+            try {
+                const res = await fetch('/api/astrology', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
+                });
+                const result = await res.json();
+                text.innerHTML = result.data || "The Oracle is silent.";
+            } catch (e) {
+                text.innerHTML = "<p class='text-red-400'>Error: Verify your API Key in Vercel Settings.</p>";
+            } finally {
+                loader.classList.add('hidden');
+                btn.disabled = false;
+                btn.innerText = "CONSULT THE ORACLE";
+            }
+        }
+    </script>
+</body>
+</html>
